@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Register</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="img/baan-d_logo.png">
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="bootstrap/css/style.css">
+    <!-- Google Fonts -->
+    <link href='https://fonts.googleapis.com/css?family=Passion+One' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Oxygen' rel='stylesheet' type='text/css'>
+    <!--    <script src="bootstrap/js/jquery.min.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <!--GA-->
+<script async src="https://www.googletagmanager.com/gtag/js?id=GTM-NJT2DNL"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments)};
+  gtag('js', new Date());
+
+  gtag('config', 'GTM-NJT2DNL');
+</script>
+<!--GA-->
+    <!-- css -->
+    <style type="text/css">
+        /* fade ออกมาตรงกลางหน้าจอ
+.fade {
+    opacity: 0;
+    -webkit-transition: opacity 1s linear;
+    transition: opacity 1s linear;
+}
+*/
+        /* fade left ออกมาจากทางซ้ายของหน้าจอ */
+        .modal.fade:not(.in) .modal-dialog {
+            -webkit-transform: translate3d(-100%, 0, 0);
+            transform: translate3d(-100%, 0, 0);
+        }
+    </style>
+    <?php 
+    require "connect.php";
+    if(isset($_POST['submit'])){
+    ?>
+    <script type="text/javascript">
+        var show = function () {
+            $('#myModal').modal('show');
+        };
+        /* กำหนดเวลาหลังเปิดหน้าเว็บ ว่าจะให้แสดงหลังโหลดหน้าเว็บแล้วกี่วินาที  เช่น 2000 = 2 วิ */
+        $(window).load(function () {
+            var timer = window.setTimeout(show, 2000);
+        });
+    </script>
+	<!--disablebutton-->
+	
+	<!--disablebutton-->
+    <?php 
+
+        $code = "B-D";
+        $sql = "SELECT MAX(registerId) AS last_id FROM tb_register";
+        $qry = mysql_query($sql) or die(mysql_error());
+        $rs = mysql_fetch_assoc($qry);
+        $maxId = substr($rs['last_id'], -7);  //ข้อมูลนี้จะติดรหัสตัวอักษรด้วย ตัดเอาเฉพาะตัวเลขท้ายนะครับ
+        $maxId = ($maxId + 1); 
+        
+        $maxId = substr("0000000".$maxId, -7);
+        $nextId = $code.$maxId;
+        $name=$_POST['name'];
+        $surName=$_POST['surName'];
+        $age=$_POST['age'];
+        $tel=$_POST['tel'];
+        //$incomePerMonth=$_POST['incomePerMonth'];
+        $status=$_POST['status'];
+        $career=$_POST['career'];
+        $borrow=$_POST['borrow'];
+        $incomePerMonthFamily=$_POST['incomePerMonthFamily'];
+        $bedroom=$_POST['bedroom'];
+        $parking=$_POST['parking'];
+        $budget=$_POST['budget'];
+        if(isset($_POST['allow'])){$allow=$_POST['allow'];}else{$allow="NO";}
+        $timeToStay=$_POST['timeToStay'];
+        $buy=$_POST['buy'];
+		mysql_query("insert into tb_register (registerId,code,name,surName,age,tel,status,career,incomePerMonthFamily,bedroom,parking,budget,timeToStay,buy,borrow,allow) values ('','$nextId','$name','$surName','$age','$tel','$status','$career','$incomePerMonthFamily','$bedroom','$parking','$budget','$timeToStay','$buy','$borrow','$allow')");
+		$registerId= mysql_insert_id();
+		
+        for($i=0;$i<count($_POST['houseId']);$i++){
+            $houseId=$_POST['houseId'][$i];
+            $sql1="INSERT INTO tb_house_of_register (registerId,houseId) values ('$registerId','$houseId')";
+            mysql_query($sql1);
+        }
+        
+        for($i=0;$i<count($_POST['locationId']);$i++){
+            $locationId=$_POST['locationId'][$i];
+            $sql="INSERT INTO tb_location_of_register (registerId,locationId) values ('$registerId','$locationId')";
+            mysql_query($sql);
+        }
+        for($i=0;$i<count($_POST['personId']);$i++){
+            $personId=$_POST['personId'][$i];
+            $sql="INSERT INTO tb_person_of_register (registerId,personId) values ('$registerId','$personId')";
+            mysql_query($sql);
+        }
+        
+    }
+    ?>
+         <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="row main">
+            <div class="main-login main-center">
+                <div class="row">
+                    <div class="col-md-9 col-xs-7">
+                        <h4><i class="fa fa-pencil-square-o" aria-hidden="true"></i>ลงทะเบียน.<br>(กรุณาตรวจสอบข้อมูลให้เรียบร้อยก่อนลงทะเบียน)</h4>
+                    </div>
+                    <div class="col-md-3 col-xs-5">
+                        <img src="img/baan-d_logo.png" width="100"><!-- class="img img-responsive"-->
+                    </div>
+                </div>
+
+  
+
+
+
+
+
+
+                <form class="" method="post" name="frmRegis" onSubmit="return validate();">
+
+                    <div class="form-group">
+                        <label for="name" class="cols-sm-2 control-label">ชื่อ</label>
+                        <div class="cols-sm-10">
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-user fa" aria-hidden="true"></i></span>
+                                <input type="text" class="form-control" name="name" id="name" placeholder="" required />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="surName" class="cols-sm-2 control-label">นามสกุล</label>
+                        <div class="cols-sm-10">
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-user fa" aria-hidden="true"></i></span>
+                                <input type="text" class="form-control" name="surName" id="surName" placeholder="" required />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="age" class="cols-sm-2 control-label">อายุ</label>
+                        <div class="cols-sm-10">
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-users fa" aria-hidden="true"></i></span>
+                                <select name="age" class="form-control" required>
+                                    <option></option>
+                                    <?php 
+									for($i=18;$i<=80;$i++){echo "<option value='$i'>$i  ปี</option>";} 
+                                    ?>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tel" class="cols-sm-2 control-label">เบอร์ติดต่อ</label>
+                        <div class="cols-sm-10">
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-tablet fa-lg" aria-hidden="true"></i></span>
+                                <input type="text" class="form-control" name="tel" id="tel" placeholder="" required minlength="10" maxlength="10"/>
+                            </div>  
+	                       </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="status" class="cols-sm-2 control-label">สถานภาพ</label>
+                        <div class="cols-sm-10 col-md-12">
+                            <div class="col-md-6 col-xs-12">
+                                <input type="radio" value="โสด" name="status" checked>
+                                โสด 
+                            </div>
+                            <div class="col-md-6 col-xs-12">
+                                <input type="radio" value="สมรส/อยู่ด้วยกัน" name="status">
+                                สมรส/อยู่ด้วยกัน
+                            </div>
+                            <div class="col-md-6 col-xs-12">
+                                <input type="radio" value="หม้าย/หย่าร้าง/แยกกันอยู่" name="status">
+                                หม้าย/หย่าร้าง/แยกกันอยู่
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="career" class="cols-sm-2 control-label" style="margin-top: 15px;">อาชีพ</label>
+                        <div class="cols-sm-10 col-md-12">
+                            <div class="col-md-6 col-xs-12">
+                                <input type="radio" value="ข้าราชการ/รัฐวิสาหกิจ" name="career" checked>
+                                ข้าราชการ/รัฐวิสาหกิจ 
+                            </div>
+                            <div class="col-md-6 col-xs-12">
+                                <input type="radio" value="พนักงานบริษัทเอกชน" name="career">
+                                พนักงานบริษัทเอกชน
+                            </div>
+                            <div class="col-md-6 col-xs-12">
+                                <input type="radio" value="ธุรกิจส่วนตัว" name="career">
+                                ธุรกิจส่วนตัว
+                            </div>
+                            <div class="col-md-6 col-xs-12">
+                                <input type="radio" value="อาชีพอิสระ/ฟรีแลนซ์" name="career">
+                                อาชีพอิสระ/ฟรีแลนซ์
+                            </div>
+                            <div class="col-md-6 col-xs-12">
+                                <input type="radio" value="อื่นๆ" name="career">
+                                อื่นๆ
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--                        <div class="form-group">
+   							<label for="incomePerMonth" class="cols-sm-2 control-label"  style="margin-top:15px;">รายได้ต่อเดือน</label>
+                                <div class="cols-sm-10 col-md-12">
+                                	<div class="col-md-4 col-xs-12">
+                                    <input type="radio" value="0 - 20,000" name="incomePerMonth" checked> 0 - 20,000 
+                                    </div>
+                                	<div class="col-md-4 col-xs-12">
+                                   <input type="radio" value="20,001 - 50,000" name="incomePerMonth"> 20,001 - 50,000 
+                                    </div>
+                                	<div class="col-md-4 col-xs-12">
+                                    <input type="radio" value="มากกว่า 50,001" name="incomePerMonth"> มากกว่า 50,001  
+                                    </div>
+                            </div>
+                        </div>
+-->
+                    <div class="form-group">
+                        <label for="incomePerMonthFamily" class="cols-sm-2 control-label" style="margin-top: 15px;">รายได้เฉลี่ยต่อครอบครัว</label>
+                        <div class="cols-sm-10 col-md-12">
+                            <div class="col-md-6 col-xs-12">
+                                <input type="radio" value="ต่ำกว่า 30,000" name="incomePerMonthFamily" checked>
+                                ต่ำกว่า 30,000 บาท/เดือน
+                            </div>
+                            <div class="col-md-6 col-xs-12">
+                                <input type="radio" value="30,001 - 50,000" name="incomePerMonthFamily">
+                                30,001 - 50,000 บาท/เดือน 
+                            </div>
+                            <div class="col-md-6 col-xs-12">
+                                <input type="radio" value="50,001 - 100,000" name="incomePerMonthFamily">
+                                50,001 - 100,000 บาท/เดือน
+                            </div>
+                            <div class="col-md-6 col-xs-12">
+                                <input type="radio" value="มากกว่า 100,000
+"
+                                    name="incomePerMonthFamily">
+                                มากกว่า 100,000 บาท/เดือน
+                            </div>
+                        </div>
+                    </div>
+ 
+					 <div class="form-group">
+                        <label for="timeToStay" class="cols-sm-2 control-label" style="margin-top: 15px;">ระยะเวลาที่ต้องการเข้าอยู่</label>
+                        <div class="cols-sm-12  col-md-12">
+                            <div class="col-md-6 col-xs-12 col-sm-4">
+                                <input type="radio" value="พร้อมเข้าอยู่ทันที" name="timeToStay" checked>
+                                พร้อมเข้าอยู่ทันที
+                            </div>
+                            <div class="col-md-6 col-xs-12 col-sm-4">
+                                <input type="radio" value="1 - 3 เดือน" name="timeToStay">
+                                1 - 3 เดือน
+                            </div>
+                            <div class="col-md-6 col-xs-12 col-sm-4">
+                                <input type="radio" value="3 - 6 เดือน" name="timeToStay">
+                                3 - 6 เดือน
+                            </div>
+                            <div class="col-md-6 col-xs-12 col-sm-4">
+                                <input type="radio" value="มากกว่า 6 เดือน" name="timeToStay">
+                                มากกว่า 6 เดือน
+                            </div>
+							<div class="col-md-6 col-xs-12 col-sm-4">
+                                <input type="radio" value="ยังไม่ต้องการซื้อบ้านในช่วงนี้" name="timeToStay" id="stay">
+                                ยังไม่ต้องการซื้อบ้านในช่วงนี้
+                            </div>
+							<!--Enabled submit-->
+					<script>
+							
+						$('#stay').change(function () {
+						$('#sub1').prop("disabled", !this.checked);
+						}).change()	
+					</script>
+								<!--Enabled submit-->
+                        </div>
+                    </div>
+					<div class="form-group">
+                        <label for="place" class="cols-sm-2 control-label" style="margin-top: 15px;">ทำเลที่สนใจ (เลือกได้มากกว่า 1)</label>
+                        <div class="cols-sm-12 col-md-12">
+                            <?php 
+                           $query=mysql_query("select * from tb_location where province = 'ry' order by locationId asc");
+
+                            while($row=mysql_fetch_array($query)){
+                            ?>
+                            <div class="col-md-6 col-xs-12" id="chk">
+                                <input type="checkbox" value="<?php echo $row['locationId'];?>" name="locationId[]">
+                                <?php echo $row['location'];?>
+                            </div>
+                            <?php }?>
+                        </div>
+							<!--Enabled submit-->
+                          
+
+						
+						<script>
+							$('div.col-md-6.col-xs-12').on("click", function(e){
+  							if($(e.target).is(':not(:checkbox)'))
+							$(this).find("input[type=checkbox]").trigger('click');
+							$("#sub1").prop("disabled",$("#chk input[type=checkbox]:checked").length == 0);
+});
+						</script>
+			<!--Enabled submit-->
+                    </div>
+                    <div class="form-group">
+                        <label for="budget" class="cols-sm-2 control-label" style="margin-top: 15px;">งบประมาณที่ต้องการซื้อ</label>
+                        <div class="cols-sm-10 col-md-12">
+                            <div class="col-md-6 col-xs-12">
+                                <input type="radio" value="ต่ำกว่า 2 ล้านบาท" name="budget" checked>
+                                ต่ำกว่า 2 ล้านบาท  
+                            </div>
+                            <div class="col-md-6 col-xs-12">
+                                <input type="radio" value="2 - 5 ล้านบาท" name="budget">
+                                2 - 5 ล้านบาท 
+                            </div>
+                            <div class="col-md-6 col-xs-12">
+                                <input type="radio" value="5 - 10 ล้านบาท" name="budget">
+                                5 - 10 ล้านบาท
+                            </div>
+                            <div class="col-md-6 col-xs-12">
+                                <input type="radio" value="มากกว่า 10 ล้านบาท" name="budget">
+                                มากกว่า 10 ล้านบาท  
+                            </div>
+                        </div>
+                    </div>
+
+                   
+
+                    <div class="form-group">
+                        <label for="house" class="cols-sm-2 control-label" style="margin-top: 15px;">ประเภทบ้าน (เลือกได้มากกว่า 1)</label>
+                        <div class="cols-sm-12  col-md-12" >
+                            <?php 
+                            $query=mysql_query("select * from tb_house order by houseName asc");
+                            while($row1=mysql_fetch_array($query)){
+                            ?>
+                            <div class="col-md-6 col-xs-12" id="chk2">
+                                <input type="checkbox" value="<?php echo $row1['houseId'];?>" name="houseId[]" >
+                                <?php echo $row1['houseName'];?>
+                            </div>
+                            <?php }?>
+                        </div>
+						<!--Enabled submit-->
+						
+						<script>
+							$('div.col-md-6.col-xs-12').on("click", function(e){
+  							if($(e.target).is(':not(:checkbox)'))
+							$(this).find("input[type=checkbox]").trigger('click');
+							$("#sub1").prop("disabled",$("#chk2 input[type=checkbox]:checked").length == 0);
+});
+						</script>
+								<!--Enabled submit-->
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bedroom" class="cols-sm-2 control-label" style="margin-top: 15px;">จำนวนห้องนอน</label>
+                        <div class="cols-sm-12  col-md-12">
+                            <div class="col-md-6 col-xs-12 col-sm-6">
+                                <input type="radio" value="1" name="bedroom" checked>
+                                1 ห้องนอน
+                            </div>
+                            <div class="col-md-6 col-xs-12 col-sm-6">
+                                <input type="radio" value="2" name="bedroom">
+                                2 ห้องนอน
+                            </div>
+                            <div class="col-md-6 col-xs-12 col-sm-6">
+                                <input type="radio" value="3" name="bedroom">
+                                3 ห้องนอน
+                            </div>
+                            <div class="col-md-6 col-xs-12 col-sm-6">
+                                <input type="radio" value="4" name="bedroom">
+                                4 ห้องนอน
+                            </div>
+                            <div class="col-md-6 col-xs-12 col-sm-6">
+                                <input type="radio" value="มากกว่า 3" name="bedroom">
+                                มากกว่า 4 ห้องนอน
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="parking" class="cols-sm-2 control-label" style="margin-top: 15px;">จำนวนที่จอดรถ</label>
+                        <div class="cols-sm-12  col-md-12">
+                            <div class="col-md-6 col-xs-12 col-sm-4">
+                                <input type="radio" value="1" name="parking" checked>
+                                1 คัน
+                            </div>
+                            <div class="col-md-6 col-xs-12 col-sm-4">
+                                <input type="radio" value="2" name="parking">
+                                2 คัน
+                            </div>
+                            <div class="col-md-6 col-xs-12 col-sm-4">
+                                <input type="radio" value="3" name="parking">
+                                3 คัน
+                            </div>
+                            <div class="col-md-6 col-xs-12 col-sm-4">
+                                <input type="radio" value="มากกว่า 3" name="parking">
+                                มากกว่า 3 คัน
+                            </div>
+                        </div>
+                    </div>
+
+                   
+
+                    <div class="form-group">
+                        <label for="person" class="cols-sm-2 control-label" style="margin-top: 15px;">บุคคลที่มีอิทธิพลต่อการตัดสินใจซื้อ (เลือกได้มากกว่า 1)</label>
+                        <div class="cols-sm-12 col-md-12" >
+                            <?php 
+                            $query=mysql_query("select * from tb_person order by personId asc");
+                            while($rowp=mysql_fetch_array($query)){
+                            ?>
+                            <div class="col-md-6 col-xs-12" id="chk3">
+                                <input type="checkbox" value="<?php echo $rowp['personId'];?>" name="personId[]">
+                                <?php echo $rowp['personName'];?>
+                            </div>
+                            <?php }?>
+                        </div>
+						<!--Enabled submit-->
+						<script type="text/javascript">
+                        
+                        
+                        </script>
+						<script>
+							$('div.col-md-6.col-xs-12').on("click", function(e){
+  							if($(e.target).is(':not(:checkbox)'))
+							$(this).find("input[type=checkbox]").trigger('click');
+							$("#sub1").prop("disabled",$("#chk3 input[type=checkbox]:checked").length == 0);
+});
+						</script>
+								<!--Enabled submit-->
+                    </div>
+
+                    <div class="form-group">
+                        <label for="buy" class="cols-sm-2 control-label" style="margin-top: 15px;">ปัจจัยที่ใช้พิจารณาในการเลือกซื้อ</label>
+                        <div class="cols-sm-12  col-md-12">
+                            <div class="col-md-6 col-xs-12 col-sm-4">
+                                <input type="radio" value="แยกครอบครัวจากพ่อแม่หรือญาติ" name="buy" checked>
+                                แยกครอบครัวจากพ่อแม่หรือญาติ
+                            </div>
+                            <div class="col-md-6 col-xs-12 col-sm-4">
+                                <input type="radio" value="บ้านหลังที่ 2" name="buy">
+                                บ้านหลังที่ 2
+                            </div>
+                            <div class="col-md-6 col-xs-12 col-sm-4">
+                                <input type="radio" value="ไม่ต้องการเช่าบ้านอยู่" name="buy">
+                                ไม่ต้องการเช่าบ้านอยู่
+                            </div>
+                            <div class="col-md-6 col-xs-12 col-sm-4">
+                                <input type="radio" value="เรือนหอ" name="buy">
+                                เรือนหอ
+                            </div>
+                            <div class="col-md-6 col-xs-12 col-sm-4">
+                                <input type="radio" value="บ้านพักตากอากาศ" name="buy">
+                                บ้านพักตากอากาศ
+                            </div>
+                            <div class="col-md-6 col-xs-12 col-sm-4">
+                                <input type="radio" value="ซื้อเพื่อลงทุนปล่อยเช่า เก็งกำไร" name="buy">
+                                ซื้อเพื่อลงทุนปล่อยเช่า เก็งกำไร
+                            </div>
+                            <div class="col-md-6 col-xs-12 col-sm-4">
+                                <input type="radio" value="เปิดกิจการทำธุรกิจ" name="buy">
+                                เปิดกิจการทำธุรกิจ
+                            </div>
+                            <div class="col-md-6 col-xs-12 col-sm-4">
+                                <input type="radio" value="อื่นๆ" name="buy">
+                                อื่นๆ
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="borrow" class="cols-sm-2 control-label" style="margin-top: 15px;">ต้องการกู้ร่วมหรือไม่</label>
+                        <div class="cols-sm-12  col-md-12">
+                            <div class="col-md-6 col-xs-12 col-sm-4">
+                                <input type="radio" value="YES" name="borrow" checked>
+                                ต้องการ
+                            </div>
+                            <div class="col-md-6 col-xs-12 col-sm-4">
+                                <input type="radio" value="NO" name="borrow">
+                                ไม่ต้องการ
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+
+                        <div class="cols-sm-12  col-md-12">
+                            <div class="col-md-12 col-xs-12 col-sm-12">
+                                <input type="checkbox" value="YES" name="allow" style="margin-top: 40px;">
+                                <font size="-1">อนุญาตให้โครงการติดต่อเพื่อเสนอโปรโมชั่นอสังหาฯ ในทำเลที่ท่านสนใจ</font>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12 col-xs-12" align="right">
+                                <button type="submit" class="btn btn-success"  name="submit" id="sub1" disabled>ลงทะเบียน <i class="fa fa-sign-in"></i></button>
+                                <button type="reset" class="btn btn-warning" id="">ยกเลิก <i class="fa fa-refresh"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <!--Chekbox Validate-->
+                
+                <script type="text/javascript">
+  function validate() {
+	  
+	    var e = document.getElementById('tel');
+		  if (!/^[0-9]+$/.test(e.value)) 
+				{ 
+				alert("กรุณาใส่เบอร์มือถือ");
+				e.value = e.value.substring(0,e.value.length-1);
+				return false;
+				}
+							
+     var chk = document.getElementsByName('locationId[]')
+	 var len = chk.length
+	 var chk2 = document.getElementsByName('houseId[]')
+	 var len2=chk2.length
+    for(i=0;i<len;i++)
+  {
+	  for(g=0;g<len2;g++)
+	  {
+	
+         if(chk[i].checked && chk2[g].checked){
+			 
+        return true;
+          }
+	  }
+   
+}
+	alert('กรุณาเลือกทำเลและประเภทบ้าน')
+    return false;
+	
+	}
+	</script>
+      
+         <!--Chekbox Validate-->           
+                <div class="row">
+                    <div class="col-md-6">
+                        <a href="" data-toggle="modal" data-target="#login" style="font-size: 12px;">ตรวจสอบอนุมัติ</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--------------form login---------------->
+    <div class="modal fade" id="login" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="exampleModalLabel">
+                        <i class="fa fa-sign-in fa-2x" style="color: #0C36BD;"></i>เข้าสู่ระบบ
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="backend/chklogin.php">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                                <input type="text" name="user" class="form-control" placeholder="Username" required />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                                <input type="password" name="pass" class="form-control" placeholder="Password" required />
+                            </div>
+                        </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-warning" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Sign In</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!------------------------------------------>
+
+    <?php
+    $sql = "SELECT * FROM tb_register order by registerId desc limit 0,1";
+    $qry = mysql_query($sql) or die(mysql_error());
+    ?>
+    <!-- modal -->
+    <div class="row">
+        <div id="myModal" class="modal fade">
+            <div class="modal-dialog modal-sm">
+                <!-- กำหนดขนาดของ modal เพิ่มได้นะครับ เช่น xs, sm, md, lg -->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h4 class="modal-title">รับสิทธิตรวจเครดิตบูโร ฟรี!!</h4>
+                    </div>
+                    <div class="modal-body">
+                        <?php 
+                        while($rs = mysql_fetch_assoc($qry)){
+                        ?>
+                        <ul class="list-group">
+                            <li class="list-group-item list-group-item-success">รหัสของท่านคือ : <font color="#EB0509"><b><?php echo $rs['code']?></b></font></li>
+                            <li class="list-group-item list-group-item-success">ชื่อ-นามสกุล : <b><?php echo $rs['name'].' '.$rs['surName'];?></b></li>
+                            <li class="list-group-item list-group-item-success">อายุ : <b><?php echo $rs['age']?></b> ปี</li>
+                            <li class="list-group-item list-group-item-success">เบอรโทรติดต่อ : <b><?php echo $rs['tel']?></b></li>
+                        </ul>
+                        <?php  } ?>
+                    </div>
+                    <div class="modal-footer">
+                        <p class="text-danger" align="left" style="font-size: 13px;">แสดงสิทธิและบัตรประชาชนเพื่อเช็คเครดิตบูโร</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
